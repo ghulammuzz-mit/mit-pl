@@ -1,0 +1,15 @@
+.claude
+CLAUDE.md
+
+# Secrets
+.env
+.env.*
+!.env.example
+*.creds
+cloudflare.creds
+
+# Build output
+bin/
+dist/
+hpa-metrics
+hpa-planning/
