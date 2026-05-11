@@ -3,6 +3,7 @@ package infisical
 import (
 	"context"
 	"fmt"
+	"mit/platform/internal/envctl/config"
 	"os"
 
 	infisical "github.com/infisical/go-sdk"
@@ -17,15 +18,36 @@ func New() (*Client, error) {
 
 	clientID := os.Getenv("INFISICAL_UNIVERSAL_AUTH_CLIENT_ID")
 	clientSecret := os.Getenv("INFISICAL_UNIVERSAL_AUTH_CLIENT_SECRET")
+	hostURL := os.Getenv("INFISICAL_HOST_URL")
+
+	// Fallback to ~/.envctl/config [default]
+	if clientID == "" || clientSecret == "" {
+		prof, err := config.Load("default")
+		if err == nil && prof != nil {
+			if clientID == "" {
+				clientID = prof.ClientID
+			}
+			if clientSecret == "" {
+				clientSecret = prof.ClientSecret
+			}
+			if hostURL == "" {
+				hostURL = prof.HostURL
+			}
+		}
+	}
+
 	if clientID == "" {
-		return nil, fmt.Errorf("INFISICAL_UNIVERSAL_AUTH_CLIENT_ID is required")
+		return nil, fmt.Errorf("Infisical client ID not set — run: envctl configure")
 	}
 	if clientSecret == "" {
-		return nil, fmt.Errorf("INFISICAL_UNIVERSAL_AUTH_CLIENT_SECRET is required")
+		return nil, fmt.Errorf("Infisical client secret not set — run: envctl configure")
+	}
+	if hostURL == "" {
+		hostURL = config.DefaultHostURL()
 	}
 
 	sdk := infisical.NewInfisicalClient(ctx, infisical.Config{
-		SiteUrl:          "https://us.infisical.com",
+		SiteUrl:          hostURL,
 		AutoTokenRefresh: true,
 	})
 
