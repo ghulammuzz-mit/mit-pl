@@ -46,17 +46,55 @@ make envctl
 | macOS   | arm64 | `envctl-darwin-arm64`        |
 | Windows | amd64 | `envctl-windows-amd64.exe`   |
 
-### Configuration
+### Quick start
 
+**1. Install**
 ```bash
-INFISICAL_UNIVERSAL_AUTH_CLIENT_ID=your-client-id
-INFISICAL_UNIVERSAL_AUTH_CLIENT_SECRET=your-client-secret
+# Linux / macOS
+curl -fsSL https://raw.githubusercontent.com/ghulammuzz-mit/mit-pl/main/scripts/install.sh | sh
 ```
 
-Load from `.env` file or set in shell. Copy `.env.example` to get started:
+**2. Configure credentials**
 ```bash
-cp .env.example .env
+envctl configure
 ```
+
+```
+Infisical Client ID [None]: your-client-id
+Infisical Client Secret [None]: your-client-secret
+Infisical Host URL [https://us.infisical.com]:
+
+Saved to ~/.envctl/config [default]
+```
+
+Credentials saved to `~/.envctl/config`. No need to set env vars manually.
+
+**3. Use**
+```bash
+envctl pull --env dev
+envctl push --env dev
+```
+
+---
+
+### configure
+
+Set up credentials interactively. Saves to `~/.envctl/config` (INI format, like AWS).
+
+```bash
+envctl configure                    # default profile
+envctl configure --profile staging  # named profile
+```
+
+Config file format (`~/.envctl/config`):
+```ini
+[default]
+infisical_client_id = your-client-id
+infisical_client_secret = your-client-secret
+infisical_host_url = https://us.infisical.com
+```
+
+Credentials resolution order: **env vars → config file → error**.
 
 ### Commands
 
