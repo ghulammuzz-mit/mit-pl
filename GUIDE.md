@@ -7,7 +7,7 @@ CLI tool for syncing environment variables between local `.env` files and Infisi
 ### One-liner (Linux / macOS)
 
 ```bash
-curl -fsSL https://raw.githubusercontent.com/ghulammuzz-mit/mit-platform/main/scripts/install.sh | sh
+curl -fsSL https://raw.githubusercontent.com/ghulammuzz-mit/mit-pl/main/scripts/install.sh | sh
 ```
 
 Installs to `/usr/local/bin/envctl`. Prompts `sudo` if needed.
@@ -15,7 +15,7 @@ Installs to `/usr/local/bin/envctl`. Prompts `sudo` if needed.
 ### One-liner (Windows — PowerShell)
 
 ```powershell
-irm https://raw.githubusercontent.com/ghulammuzz-mit/mit-platform/main/scripts/install.ps1 | iex
+irm https://raw.githubusercontent.com/ghulammuzz-mit/mit-pl/main/scripts/install.ps1 | iex
 ```
 
 Installs to `%LOCALAPPDATA%\Programs\envctl\envctl.exe` and adds to user PATH.

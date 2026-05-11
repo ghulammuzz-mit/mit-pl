@@ -1,7 +1,7 @@
 #!/bin/sh
 set -e
 
-REPO="ghulammuzz-mit/mit-platform"
+REPO="ghulammuzz-mit/mit-pl"
 BINARY="envctl"
 INSTALL_DIR="/usr/local/bin"
 

@@ -1,6 +1,6 @@
 $ErrorActionPreference = "Stop"
 
-$Repo = "ghulammuzz-mit/mit-platform"
+$Repo = "ghulammuzz-mit/mit-pl"
 $Binary = "envctl"
 $Filename = "envctl-windows-amd64.exe"
 $Url = "https://github.com/$Repo/releases/latest/download/$Filename"
