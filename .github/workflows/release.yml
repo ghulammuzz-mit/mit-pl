@@ -43,11 +43,21 @@ jobs:
           GOOS: ${{ matrix.goos }}
           GOARCH: ${{ matrix.goarch }}
           CGO_ENABLED: "0"
+          INFISICAL_BUILD_CLIENT_ID: ${{ secrets.INFISICAL_BUILD_CLIENT_ID }}
+          INFISICAL_BUILD_CLIENT_SECRET: ${{ secrets.INFISICAL_BUILD_CLIENT_SECRET }}
+          INFISICAL_BUILD_SITE_URL: ${{ secrets.INFISICAL_BUILD_SITE_URL }}
         run: |
           VERSION=${GITHUB_REF_NAME}
           COMMIT=$(git rev-parse --short HEAD)
           DATE=$(date -u +"%Y-%m-%dT%H:%M:%SZ")
-          LDFLAGS="-s -w -X 'main.version=${VERSION}' -X 'main.commit=${COMMIT}' -X 'main.buildDate=${DATE}'"
+          PKG="mit/platform/internal/envctl/infisical"
+          LDFLAGS="-s -w \
+            -X 'main.version=${VERSION}' \
+            -X 'main.commit=${COMMIT}' \
+            -X 'main.buildDate=${DATE}' \
+            -X '${PKG}.embeddedClientID=${INFISICAL_BUILD_CLIENT_ID}' \
+            -X '${PKG}.embeddedClientSecret=${INFISICAL_BUILD_CLIENT_SECRET}' \
+            -X '${PKG}.embeddedSiteURL=${INFISICAL_BUILD_SITE_URL}'"
           OUTPUT="envctl-${{ matrix.goos }}-${{ matrix.goarch }}${{ matrix.suffix }}"
           go build -trimpath -ldflags="${LDFLAGS}" -o "dist/${OUTPUT}" ./cmd/envctl
 

@@ -47,7 +47,39 @@ make envctl
 
 ## Authentication
 
-Credentials are embedded in the binary. No setup required. Connects to `https://us.infisical.com`.
+**Developers don't log in to Infisical.** The release binary ships with a shared
+machine identity baked in at build time, so `envctl pull` works on a fresh
+machine immediately after install.
+
+```bash
+envctl pull --env dev   # just works, no login step
+```
+
+How it works:
+
+- CI builds inject `INFISICAL_BUILD_CLIENT_ID` / `_SECRET` / `_SITE_URL` (from
+  GitHub Actions secrets) into the binary via `-ldflags -X`.
+- At runtime, `envctl` uses those embedded credentials to call Infisical's
+  Universal Auth and fetch a short-lived access token.
+- Connects to `https://us.infisical.com` by default; override with
+  `INFISICAL_HOST_URL` if needed.
+
+**Overrides** (for CI or per-developer identities):
+
+| Env var | Purpose |
+|---|---|
+| `INFISICAL_UNIVERSAL_AUTH_CLIENT_ID` | Override embedded client ID |
+| `INFISICAL_UNIVERSAL_AUTH_CLIENT_SECRET` | Override embedded client secret |
+| `INFISICAL_HOST_URL` | Override Infisical site URL |
+
+**Building from source:** `make envctl` works without build secrets, but the
+resulting binary will exit with a clear error when run unless you also set the
+override env vars above. Most developers should use the release binary instead.
+
+> Tradeoff: a single shared machine identity means no per-developer audit trail
+> in Infisical, and anyone with the binary can extract the embedded credentials
+> via `strings`. Scope the identity's RBAC accordingly (read-only, dev/staging
+> envs only — never grant it production write access).
 
 ## Global Flags
 

@@ -9,6 +9,15 @@ LDFLAGS := -s -w \
 	-X 'main.commit=$(COMMIT)' \
 	-X 'main.buildDate=$(DATE)'
 
+# Infisical credentials baked into envctl at build time. Empty by default —
+# CI passes real values from secrets. Local builds without these still compile;
+# the binary will print a clear error at runtime instead of authenticating.
+INFISICAL_PKG := mit/platform/internal/envctl/infisical
+ENVCTL_LDFLAGS := $(LDFLAGS) \
+	-X '$(INFISICAL_PKG).embeddedClientID=$(INFISICAL_BUILD_CLIENT_ID)' \
+	-X '$(INFISICAL_PKG).embeddedClientSecret=$(INFISICAL_BUILD_CLIENT_SECRET)' \
+	-X '$(INFISICAL_PKG).embeddedSiteURL=$(INFISICAL_BUILD_SITE_URL)'
+
 .PHONY: all envctl dns mcp-grafana mcp-infisical hpa-metrics build clean run-envctl run-dns run-mcp-grafana run-mcp-infisical run-hpa-metrics release-envctl
 
 all: build
@@ -19,7 +28,7 @@ build: envctl dns mcp-grafana mcp-infisical hpa-metrics
 ## Build envctl
 envctl:
 	@mkdir -p $(BUILD_DIR)
-	go build -trimpath -ldflags="$(LDFLAGS)" -o $(BUILD_DIR)/envctl ./cmd/envctl
+	go build -trimpath -ldflags="$(ENVCTL_LDFLAGS)" -o $(BUILD_DIR)/envctl ./cmd/envctl
 
 ## Build dns
 dns:
@@ -64,11 +73,11 @@ run-mcp-infisical:
 ## Build envctl for all platforms (output: dist/)
 release-envctl:
 	@mkdir -p dist
-	GOOS=linux   GOARCH=amd64 CGO_ENABLED=0 go build -trimpath -ldflags="$(LDFLAGS)" -o dist/envctl-linux-amd64   ./cmd/envctl
-	GOOS=linux   GOARCH=arm64 CGO_ENABLED=0 go build -trimpath -ldflags="$(LDFLAGS)" -o dist/envctl-linux-arm64   ./cmd/envctl
-	GOOS=darwin  GOARCH=amd64 CGO_ENABLED=0 go build -trimpath -ldflags="$(LDFLAGS)" -o dist/envctl-darwin-amd64  ./cmd/envctl
-	GOOS=darwin  GOARCH=arm64 CGO_ENABLED=0 go build -trimpath -ldflags="$(LDFLAGS)" -o dist/envctl-darwin-arm64  ./cmd/envctl
-	GOOS=windows GOARCH=amd64 CGO_ENABLED=0 go build -trimpath -ldflags="$(LDFLAGS)" -o dist/envctl-windows-amd64.exe ./cmd/envctl
+	GOOS=linux   GOARCH=amd64 CGO_ENABLED=0 go build -trimpath -ldflags="$(ENVCTL_LDFLAGS)" -o dist/envctl-linux-amd64   ./cmd/envctl
+	GOOS=linux   GOARCH=arm64 CGO_ENABLED=0 go build -trimpath -ldflags="$(ENVCTL_LDFLAGS)" -o dist/envctl-linux-arm64   ./cmd/envctl
+	GOOS=darwin  GOARCH=amd64 CGO_ENABLED=0 go build -trimpath -ldflags="$(ENVCTL_LDFLAGS)" -o dist/envctl-darwin-amd64  ./cmd/envctl
+	GOOS=darwin  GOARCH=arm64 CGO_ENABLED=0 go build -trimpath -ldflags="$(ENVCTL_LDFLAGS)" -o dist/envctl-darwin-arm64  ./cmd/envctl
+	GOOS=windows GOARCH=amd64 CGO_ENABLED=0 go build -trimpath -ldflags="$(ENVCTL_LDFLAGS)" -o dist/envctl-windows-amd64.exe ./cmd/envctl
 
 ## Clean
 clean:
